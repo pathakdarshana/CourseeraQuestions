@@ -1,46 +1,62 @@
-import sys, threading
-sys.setrecursionlimit(10**7)
-threading.stack_size(2**27) 
+var readline = require('readline');
+var rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
 
-class TreeHeight:
-    def read(self):
-        self.n = int(sys.stdin.readline())
-        self.parent = list(map(int, sys.stdin.readline().split()))
-        self.nodes = {}
-        for i in range(self.n):
-            self.nodes[i] = []
-        for i in range(self.n):
-            if self.parent[i] == -1:
-                pass
-            else:
-                self.nodes[self.parent[i]] += [i]
+rl.question( '', (numberOfNodes) => {
+    rl.question ('', (numbers) => {
+        let i;
+        let arr=[];
+        let nodesArray = [];
+        let rootNode;
+        let height =1;
+        let computedHeight =0;
+        arr = numbers.split(' ');
+        for (i=0; i<numberOfNodes; i++) {
+            nodesArray.push([]);
+        }
 
-    def compute_height(self):
-        root = None
-        try:
-            root = self.parent.index(-1)
-        except ValueError:
-            return 0
-        queue = []
-        queue.append(root)
-        height = 0
+        for (i=0; i<numberOfNodes; i++) {
+            if (arr[i] == -1) {
+                rootNode = [i];
+            } else {
+                nodesArray[arr[i]].push([i]);
+            }
+        }
 
-        while True:
-            node_count = len(queue)
-            if node_count == 0:
-                return height
-            height += 1
-            while node_count > 0:
-                node = queue[0]
-                queue.pop(0)
-                if self.nodes[node]:
-                    for v in self.nodes[node]:
-                        queue.append(v)
-                node_count -= 1
+        function CalculateHeight (rootNode) {
+            let newHeight = 0;
+            for(let i=0; i<rootNode.length; i++) {
+                console.log (`value of i ${i}`);
+                let childNodes = [];
+                childNodes = nodesArray[rootNode[i]];
+                console.log(`this is child node ${childNodes}`);
+                if (childNodes.length != 0) {
+                    height+=1;
+                    console.log(`Height is ${height}`);
+                    newHeight = CalculateHeight(childNodes);
+                    height-=1;
 
-def main():
-    tree = TreeHeight()
-    tree.read()
-    print(tree.compute_height())
+                    if (newHeight >= height && newHeight > computedHeight) {
+                        computedHeight = newHeight;
+                    }
+                } else {
+                    if (computedHeight < height){
+                        computedHeight = height;
+                    }
+                }
+                console.log(`new height ${newHeight}`);
+                console.log(`Computed Heigth${computedHeight}`);
+                console.log(`increase value of i ${i}`);
+            }
+            return height
+        }
 
-threading.Thread(target=main).start()
+        CalculateHeight(rootNode);
+
+        console.log(computedHeight);
+        rl.close();
+        process.stdin.destroy();
+    });
+});
